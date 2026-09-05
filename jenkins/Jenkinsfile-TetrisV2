@@ -1,0 +1,116 @@
+pipeline {
+    agent any
+    tools {
+        nodejs 'nodejs'
+    }
+    environment {
+        SCANNER_HOME      = tool 'sonar-scanner'
+        SONAR_SERVER      = 'sonar-server'
+        DOCKER_IMAGE_NAME = 'avian19/tetrisv2'
+        GIT_REPO_URL      = 'https://github.com/AmanPathak-DevOps/End-to-End-Kubernetes-DevSecOps-Tetris-Project.git'
+        GIT_REPO_BRANCH   = 'master'
+        GIT_REPO_NAME     = 'End-to-End-Kubernetes-DevSecOps-Tetris-Project'
+        GIT_USER_NAME     = 'AmanPathak-DevOps'
+        GIT_USER_EMAIL    = 'aman07pathak@gmail.com'
+    }
+    stages {
+        stage('Cleaning Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Checkout from Git') {
+            steps {
+                git branch: "${GIT_REPO_BRANCH}", url: "${GIT_REPO_URL}"
+            }
+        }
+        stage('Sonarqube Analysis') {
+            steps {
+                dir('frontend/v2') {
+                    withSonarQubeEnv("${SONAR_SERVER}") {
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Tetris-V2 \
+                        -Dsonar.projectKey=Tetris-V2 '''
+                    }
+                }
+            }
+        }
+        stage('Quality Check') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
+            }
+        }
+        stage('Installing Dependencies') {
+            steps {
+                dir('frontend/v2') {
+                    sh 'npm install'
+                }
+            }
+        }
+        stage('OWASP Dependency-Check Scan') {
+            steps {
+                dir('frontend/v2') {
+                    dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                }
+            }
+        }
+        stage('Trivy File Scan') {
+            steps {
+                dir('frontend/v2') {
+                    sh 'trivy fs . > trivyfs.txt'
+                }
+            }
+        }
+        stage("Docker Image Build") {
+            steps {
+                script {
+                    dir('frontend/v2') {
+                        withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                            sh 'docker build -t tetrisv2 .'
+                        }
+                    }
+                }
+            }
+        }
+        stage("Docker Image Pushing") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                        sh "docker tag tetrisv2 ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}"
+                        sh "docker push ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}"
+                    }
+                }
+            }
+        }
+        stage("TRIVY Image Scan") {
+            steps {
+                sh "trivy image ${DOCKER_IMAGE_NAME}:${BUILD_NUMBER} > trivyimage.txt"
+            }
+        }
+        stage('Checkout Code') {
+            steps {
+                git branch: "${GIT_REPO_BRANCH}", url: "${GIT_REPO_URL}"
+            }
+        }
+        stage('Update Deployment file') {
+            steps {
+                dir('k8s-manifests') {
+                    withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                        sh '''
+                            git config user.email "${GIT_USER_EMAIL}"
+                            git config user.name "${GIT_USER_NAME}"
+                            BUILD_NUMBER=${BUILD_NUMBER}
+                            echo "Updating Kubernetes deployment manifest to build #${BUILD_NUMBER}..."
+                            sed -i -E "s|avian19/tetrisv[0-9]:[a-zA-Z0-9._-]+|avian19/tetrisv2:${BUILD_NUMBER}|g" deployment-service.yml
+                            git add deployment-service.yml
+                            git commit -m "Update deployment Image to tetrisv2 version ${BUILD_NUMBER}" || echo "No changes to commit"
+                            git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:${GIT_REPO_BRANCH}
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}

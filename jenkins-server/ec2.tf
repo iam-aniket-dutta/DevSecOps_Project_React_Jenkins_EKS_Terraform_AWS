@@ -1,0 +1,26 @@
+resource "aws_instance" "ec2" {
+  ami                    = data.aws_ami.ami.image_id
+  instance_type          = "t3a.xlarge"
+  key_name               = var.key-name
+  subnet_id              = aws_subnet.public-subnet.id
+  vpc_security_group_ids = [aws_security_group.security-group.id]
+  iam_instance_profile   = aws_iam_instance_profile.instance-profile.name
+
+  root_block_device {
+    volume_size           = 50
+    volume_type           = "gp3"
+    encrypted             = true
+    delete_on_termination = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required" # Enforces IMDSv2
+  }
+
+  user_data = templatefile("./tools-install.sh", {})
+
+  tags = {
+    Name = var.instance-name
+  }
+}
