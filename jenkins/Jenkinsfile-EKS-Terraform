@@ -10,8 +10,8 @@ pipeline {
     environment {
         AWS_REGION      = 'us-east-1'
         AWS_CREDENTIALS = 'aws-key'
-        GIT_REPO_URL    = 'https://github.com/AmanPathak-DevOps/End-to-End-Kubernetes-DevSecOps-Tetris-Project.git'
-        GIT_REPO_BRANCH = 'master'
+        GIT_REPO_URL    = 'https://github.com/iam-aniket-dutta/DevSecOps_Project_React_Jenkins_EKS_Terraform_AWS.git'
+        GIT_REPO_BRANCH = 'main'
     }
     stages {
         stage('Checkout from Git') {

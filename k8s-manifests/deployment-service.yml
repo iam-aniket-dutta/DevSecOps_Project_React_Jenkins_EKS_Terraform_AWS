@@ -14,10 +14,10 @@ spec:
         app: tetris
     spec:
       containers:
-      - name: tetris
-        image: avian19/tetrisv1:latest
-        ports:
-        - containerPort: 80
+        - name: tetris
+          image: aniketnitu2026/tetris:latest
+          ports:
+            - containerPort: 3000
 ---
 apiVersion: v1
 kind: Service
@@ -27,8 +27,7 @@ spec:
   selector:
     app: tetris
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
   type: LoadBalancer
-

@@ -6,12 +6,12 @@ pipeline {
     environment {
         SCANNER_HOME      = tool 'sonar-scanner'
         SONAR_SERVER      = 'sonar-server'
-        DOCKER_IMAGE_NAME = 'avian19/tetrisv1'
-        GIT_REPO_URL      = 'https://github.com/AmanPathak-DevOps/End-to-End-Kubernetes-DevSecOps-Tetris-Project.git'
-        GIT_REPO_BRANCH   = 'master'
-        GIT_REPO_NAME     = 'End-to-End-Kubernetes-DevSecOps-Tetris-Project'
-        GIT_USER_NAME     = 'AmanPathak-DevOps'
-        GIT_USER_EMAIL    = 'aman07pathak@gmail.com'
+        DOCKER_IMAGE_NAME = 'aniketnitu2026/tetris'
+        GIT_REPO_URL      = 'https://github.com/iam-aniket-dutta/DevSecOps_Project_React_Jenkins_EKS_Terraform_AWS.git'
+        GIT_REPO_BRANCH   = 'main'
+        GIT_REPO_NAME     = 'DevSecOps_Project_React_Jenkins_EKS_Terraform_AWS'
+        GIT_USER_NAME     = 'iam-aniket-dutta'
+        GIT_USER_EMAIL    = [EMAIL_ADDRESS]
     }
     stages {
         stage('Cleaning Workspace') {
