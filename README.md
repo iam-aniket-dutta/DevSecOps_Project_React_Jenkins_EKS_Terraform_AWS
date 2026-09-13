@@ -114,6 +114,7 @@ DevSecOps_Project_EKS_Jenkins_Terraform_ArgoCD/
 │   ├── eks-node-group.tf          #   Managed Node Group (t3a.medium, 1–3 nodes)
 │   ├── iam-role.tf                #   IAM Roles (EKSClusterRole, EKSNodeGroupRole)
 │   ├── iam-policy.tf              #   IAM Policy attachments (EKS, EC2, CNI)
+│   ├── output.tf                  #   Outputs: cluster endpoint, kubeconfig command, ARNs
 │   ├── variables.tf               #   Variable declarations
 │   └── variables.tfvars           #   Variable values (cluster name, node group, IAM)
 │
@@ -123,8 +124,7 @@ DevSecOps_Project_EKS_Jenkins_Terraform_ArgoCD/
 │   └── Jenkinsfile-EKS-Terraform  #   Parameterized pipeline for EKS provisioning
 │
 ├── k8s-manifests/                 # Kubernetes Deployment Manifests
-│   ├── deployment-service.yml     #   Deployment (3 replicas) + LoadBalancer Service
-│   └── ingress.yaml               #   ALB Ingress resource (commented out — optional)
+│   └── deployment-service.yml     #   Deployment (3 replicas) + LoadBalancer Service
 │
 ├── assets/                        # Documentation assets
 │   └── Infra.gif                  #   Infrastructure architecture diagram
@@ -181,6 +181,13 @@ Provisions an **Amazon EKS cluster** (Kubernetes v1.33) that **reuses the Jenkin
   - `EKSNodeGroupRole` — for worker nodes (with EKS Worker, CNI, and ECR policies)
 - Managed Node Group (`Tetris-Node-Group`): `t3a.medium` instances, scaling 1–3 nodes, 20 GB disk
 
+**Terraform Outputs** ([`output.tf`](eks/output.tf)):
+- `eks_cluster_name`, `eks_cluster_endpoint`, `eks_cluster_version`
+- `eks_cluster_certificate_authority` — base64 CA cert for cluster communication
+- `eks_node_group_name`, `eks_node_group_status`
+- `eks_cluster_role_arn`, `eks_node_group_role_arn`
+- `eks_kubeconfig_command` — ready-to-run `aws eks update-kubeconfig` command
+
 ---
 
 ### `jenkins/` — CI/CD Pipeline Definitions
@@ -208,7 +215,6 @@ The final stage uses `sed` to update the image tag in `k8s-manifests/deployment-
 ### `k8s-manifests/` — Kubernetes Manifests
 
 - **`deployment-service.yml`** — Defines a Tetris `Deployment` (3 replicas) pulling from `aniketnitu2026/tetris:<tag>`, exposed via a `LoadBalancer` Service on port `80 → 3000`.
-- **`ingress.yaml`** — Optional ALB Ingress resource (currently commented out). Can be enabled for AWS ALB-based routing.
 
 ---
 

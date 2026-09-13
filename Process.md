@@ -314,6 +314,22 @@ The pipeline will:
 
 > ⏳ EKS cluster provisioning typically takes **10–15 minutes**.
 
+### EKS Terraform Outputs
+
+After a successful apply, the `eks/output.tf` provides these outputs:
+
+| Output | Description |
+|---|---|
+| `eks_cluster_name` | Name of the EKS cluster (`Tetris-EKS-Cluster`) |
+| `eks_cluster_endpoint` | API server endpoint URL |
+| `eks_cluster_version` | Kubernetes version running on the cluster |
+| `eks_cluster_certificate_authority` | Base64 CA cert for cluster communication |
+| `eks_node_group_name` | Name of the managed node group |
+| `eks_node_group_status` | Current status of the node group |
+| `eks_cluster_role_arn` | ARN of the EKS cluster IAM role |
+| `eks_node_group_role_arn` | ARN of the node group IAM role |
+| `eks_kubeconfig_command` | Ready-to-run `aws eks update-kubeconfig` command |
+
 ---
 
 ## Phase 9: Configure kubectl & EKS Access
@@ -327,6 +343,8 @@ ssh -i "cicd.pem" ubuntu@<EC2_PUBLIC_IP>
 ```
 
 ### Step 2: Update kubeconfig
+
+Use the `eks_kubeconfig_command` output from Terraform, or run manually:
 
 ```bash
 aws eks update-kubeconfig --name Tetris-EKS-Cluster --region us-east-1
