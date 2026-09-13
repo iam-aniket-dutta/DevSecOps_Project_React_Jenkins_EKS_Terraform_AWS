@@ -1,3 +1,4 @@
+variable "ami_id" {}
 variable "vpc-name" {}
 variable "igw-name" {}
 variable "rt-name" {}

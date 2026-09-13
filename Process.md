@@ -14,6 +14,9 @@ squ_4c3cf80536aa39145b4e69b5c6149135ef45ece4
 
 Install Jenkins Plugins:
 Aws credentails
+Pipeline: AWS steps
+Pipeline: stage view
+rebuilder
 Docker
 Docker Commons
 Docker API

@@ -1,3 +1,4 @@
+ami_id = "ami-0b6d9d3d33ba97d99"
 vpc-name      = "Jenkins-vpc"
 igw-name      = "Jenkins-igw"
 subnet-name   = "Jenkins-subnet"
