@@ -11,7 +11,7 @@ pipeline {
         GIT_REPO_BRANCH   = 'main'
         GIT_REPO_NAME     = 'DevSecOps_Project_React_Jenkins_EKS_Terraform_AWS'
         GIT_USER_NAME     = 'iam-aniket-dutta'
-        GIT_USER_EMAIL    = [EMAIL_ADDRESS]
+        GIT_USER_EMAIL    = 'duttaaniket005@gmail.com'
     }
     stages {
         stage('Cleaning Workspace') {
@@ -103,7 +103,7 @@ pipeline {
                             git config user.name "${GIT_USER_NAME}"
                             BUILD_NUMBER=${BUILD_NUMBER}
                             echo "Updating Kubernetes deployment manifest to build #${BUILD_NUMBER}..."
-                            sed -i -E "s|avian19/tetrisv[0-9]:[a-zA-Z0-9._-]+|avian19/tetrisv1:${BUILD_NUMBER}|g" deployment-service.yml
+                            sed -i -E "s|${DOCKER_IMAGE_NAME}:[a-zA-Z0-9._-]+|${DOCKER_IMAGE_NAME}:${BUILD_NUMBER}|g" deployment-service.yml
                             git add deployment-service.yml
                             git commit -m "Update deployment Image to tetrisv1 version ${BUILD_NUMBER}" || echo "No changes to commit"
                             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:${GIT_REPO_BRANCH}
