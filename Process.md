@@ -9,7 +9,7 @@
 cat ~/.aws/credentials
 
 
-squ_4c3cf80536aa39145b4e69b5c6149135ef45ece4
+squ_3fa91d5e311b98615bdb3be414ac432e0b0c9547
 
 
 Install Jenkins Plugins:

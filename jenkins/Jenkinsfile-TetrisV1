@@ -28,8 +28,8 @@ pipeline {
             steps {
                 dir('frontend/v1') {
                     withSonarQubeEnv("${SONAR_SERVER}") {
-                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Tetris-V1 \
-                        -Dsonar.projectKey=Tetris-V1 '''
+                        sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Tetris \
+                        -Dsonar.projectKey=Tetris '''
                     }
                 }
             }
